@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Sensori</title>
+    <style>
+        table { border-collapse: collapse; width: 50%; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background-color: #f4f4f4; }
+    </style>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="skybox" >
+        <h1 id="titolo">Ciao!</h1>
+        <h1>Dati Sensori</h1>
+    <div>
+        <canvas id="circle" width="200" height="100"></canvas>
+    </div>
+    <div>
+        <canvas id="arch" width="1676" height="1000"></canvas>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Valore</th>
+            </tr>
+        </thead>
+        <tbody id="tabella">
+            <!-- Le righe verranno inserite dinamicamente -->
+        </tbody>
+    </table>
+
+    <script>
+        //-----------------------Disegno cerchio------------------------------------
+            const cerchio = document.getElementById('circle');
+            const cvx = cerchio.getContext('2d');
+            const radius = 42;
+
+            let posX = 50;
+            let posY = cerchio.height / 2;
+            let speedX = 2;
+
+        function drawCircle(){
+            
+            cvx.beginPath();
+            cvx.arc(posX, posY, radius, 0, 2 * Math.PI, false);
+
+            cvx.fillStyle = 'blue';
+            cvx.fill();
+
+            cvx.lineWidth= 3;
+            cvx.strokeStyle = 'green';
+            cvx.stroke();
+        }
+        //------------------------Animazione Cerchio--------------------------------------------------
+        function moveCircle(){
+
+            cvx.clearRect(0, 0, cerchio.width, cerchio.height);
+            posX += speedX;
+
+            if (posX + radius > cerchio.width - 2 || posX - radius - 2 < 0) {
+            speedX = -speedX;}
+            
+            drawCircle();
+            requestAnimationFrame(moveCircle);
+            
+        }
+
+        moveCircle();
+
+        //--------------------------Disegno Arco-------------------------------------------------
+        
+        const arch = document.getElementById('arch');
+            const ctx = arch.getContext('2d');
+            const arch_radius = 436;
+            
+            let pos_arch_x = arch.width/2;
+            let pos_arch_y = arch.height / 2;
+
+        function drawArch(){
+            ctx.beginPath();
+            ctx.arc(pos_arch_x, pos_arch_y, arch_radius, 0, Math.PI, true);
+
+            ctx.lineWidth = 30;
+            ctx.strokeStyle = 'green';
+            ctx.stroke();
+
+        }
+
+        drawArch();
+
+        // Richiedo i dati all'API
+        fetch('/sensori')
+            .then(res => res.json())
+            .then(dati => {
+                const tabella = document.getElementById('tabella');
+
+                // Per ogni record creo una riga nella tabella
+                dati.forEach(riga => {
+                    tabella.innerHTML += `
+                        <tr>
+                            <td>${riga.sensori_id}</td>
+                            <td>${riga.valore}</td>
+                        </tr>
+                    `;
+                });
+            });
+    </script>
+    </div>
+</body>
+</html>
+<!---
+Browser → GET /        → Node.js legge index.html → mostra la pagina
+Browser → GET /sensori → Node.js legge il DB      → restituisce JSON → fetch() popola la tabella
+---->

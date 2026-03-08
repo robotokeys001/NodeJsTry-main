@@ -1,0 +1,13 @@
+#titolo{
+    color: blanchedalmond;
+}
+#titolo:hover, #titolo:active{
+    color:aqua;
+}
+
+body::before{
+    background-color: blue;
+}
+body::after{
+    background-color: aqua;
+}
