@@ -1,0 +1,1 @@
+//find, some, every, push/pop, slice e sort
