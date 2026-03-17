@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id="myCanvas" width="400" height="400"></canvas>
+
+<script>
+  const canvas = document.getElementById("myCanvas");
+  const ctx = canvas.getContext("2d");
+
+  const cx = 200;         // centro X
+  const cy = 200;         // centro Y
+  const r = 150;          // raggio esterno
+  const spessore = 40;    // spessore dell'arco
+  const gap = 0.05;       // piccolo spazio tra le sezioni (in radianti)
+
+  const colori = ["#e74c3c", "#3498db", "#2ecc71"];
+  const totale = 2 * Math.PI;          // cerchio completo
+  const sezione = totale / 3;          // 120° per sezione
+
+  for (let i = 0; i < 3; i++) {
+    const start = i * sezione + gap;
+    const end = start + sezione - gap * 2;
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, start, end);               // arco esterno
+    ctx.arc(cx, cy, r - spessore, end, start, true); // arco interno (inverso)
+    ctx.closePath();
+
+    ctx.fillStyle = colori[i];
+    ctx.fill();
+  }
+</script>
+</body>
+</html>

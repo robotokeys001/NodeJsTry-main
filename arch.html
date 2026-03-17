@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .chart{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .valoreSole{
+            display: flex;
+           
+           font-size: large;
+        }
+        .arch{
+            display: flex;
+           
+          
+        }
+
+    </style>
+</head>
+<body>
+     <div class="chart">
+        <canvas id="arch" width="1000" height="500" class="arch"></canvas>
+        <p id="valoreSole" class="valoreSole"></p>
+    </div>
+    <script>
+        let valoreRandom = ()=> Math.floor(Math.random() * 255);
+        const valoreSole = document.getElementById('valoreSole');
+        valoreSole.innerHTML=` Il valore del sole è ${valoreRandom()}`;
+
+
+        const arch = document.getElementById('arch');
+            const ctx = arch.getContext('2d');
+            const arch_radius = 436;
+            
+            let pos_arch_x = arch.width/2;
+            let pos_arch_y = 500;
+            let arch_dimension = Math.PI;
+            let arch_section = (Math.PI)/3;
+            
+
+        function drawArch(){
+            for (let i = 0; i < 3; i++){
+                
+                const startAngle = i * arch_section + arch_dimension;
+                const endAngle = startAngle + arch_section; 
+                ctx.strokeStyle = `rgb(
+                0
+                ${Math.floor(255 - 42.5 * i)}
+                ${Math.floor(255 - 42.5 * i)})`;
+                
+                ctx.beginPath();
+                ctx.arc(pos_arch_x, pos_arch_y, arch_radius, startAngle, endAngle);
+                
+
+                ctx.lineWidth = 30;
+                ctx.stroke();
+                
+                }
+                
+            }
+        
+        drawArch();
+      
+     
+        console.log(arch.width/2);
+         console.log(arch.height / 2);
+    </script>
+
+</body>
+</html>

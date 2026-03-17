@@ -91,6 +91,27 @@
 
         drawArch();
 
+    //----------------Animazione Arco-------------------------------------------------
+    let random = ()=> Math.floor(Math.random() * 255);
+    function animateArch(){
+            ctx.beginPath();
+            ctx.arc(pos_arch_x, pos_arch_y, arch_radius, 0, Math.PI, true);
+            
+            if (random() >155){
+            ctx.lineWidth = 30;
+            ctx.strokeStyle = 'green';
+            ctx.stroke();
+            }else if (random()< 155){
+                ctx.lineWidth = 30;
+            ctx.strokeStyle = 'blue';
+            ctx.stroke();
+
+            }
+
+    }
+    console.log(random());
+    animateArch();
+
         // Richiedo i dati all'API
         fetch('/sensori')
             .then(res => res.json())
