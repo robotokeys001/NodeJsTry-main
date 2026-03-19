@@ -5,20 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
+
+        @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+    
         .chart{
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: space-evenly;
+            gap: 20px;
+            
         }
         .valoreSole{
-            display: flex;
+           font-family: "Inter", sans-serif;
+           align-self: center;
+           font-size: 40px; 
+           margin-top: -50px; 
            
-           font-size: large;
         }
         .arch{
-            display: flex;
-           
-          
+          max-width: 100%;
+          height: auto;
         }
 
     </style>
@@ -29,37 +35,118 @@
         <p id="valoreSole" class="valoreSole"></p>
     </div>
     <script>
-        let valoreRandom = ()=> Math.floor(Math.random() * 255);
-        const valoreSole = document.getElementById('valoreSole');
-        valoreSole.innerHTML=` Il valore del sole è ${valoreRandom()}`;
+
+                // --- DATI (Simulati) ---
+        // Valore iniziale del Solar Tracker (Azimut)
+        let datiSolarTracker = {
+            azimut: 135 // Il valore attuale
+        };
+
+        // --- CONFIGURAZIONE SOGLIA ---
+        // Definiamo cosa costituisce un "cambiamento significativo" (es. > 0.5 gradi)
+        const SOGLIA_CAMBIAMENTO_AZIMUT = 0.5;
+
+        // Memorizziamo l'ultimo valore che abbiamo visualizzato
+        let ultimoValoreVisualizzatoAzimut = datiSolarTracker.azimut;
+
+        // --- FUNZIONE DI AGGIORNAMENTO VISTA ---
+        // Questa funzione si occupa ESCLUSIVAMENTE di aggiornare l'elemento HTML/Canvas
+        function aggiornaVistaAzimut(nuovoValore) {
+            console.log(`[VISTA] Aggiornamento visivo dell'Azimut a: ${nuovoValore}°`);
+            
+            // ESEMPIO HTML: Aggiorna un testo in un elemento HTML
+            const elementoAzimutText = document.getElementById('valoreSole');
+            if (elementoAzimutText) {
+                elementoAzimutText.innerText = `${nuovoValore}°`;
+            }
+
+            // ESEMPIO CANVAS: Chiamerebbe la tua funzione di disegno del Canvas
+            // (es. ridisegnare la lancetta o il gauge)
+            // drawArch(nuovoValore);
+        }
+
+// --- FUNZIONE DI AGGIORNAMENTO DATI E VERIFICA REATTIVA ---
+// Questa è la funzione centrale che riceve i nuovi dati grezzi
+    function riceviNuovoDatoAzimut(valoreGrezzo) {
+        // 1. Verifichiamo se il dato è un numero valido
+        let valoreVerificato = parseFloat(valoreGrezzo);
+        if (isNaN(valoreVerificato)) return;
+
+        // 2. Calcoliamo la differenza assoluta rispetto all'ultimo valore visualizzato
+        let differenza = Math.abs(valoreVerificato - ultimoValoreVisualizzatoAzimut);
+
+        // 3. Verifichiamo la significatività
+        if (differenza >= SOGLIA_CAMBIAMENTO_AZIMUT) {
+            // Il cambiamento è significativo! Aggiorniamo!
+            console.log(`[DATI] Rilevato cambiamento significativo (${differenza}°).`);
+            
+            // Aggiorniamo lo stato dei dati
+            datiSolarTracker.azimut = valoreVerificato;
+            ultimoValoreVisualizzatoAzimut = valoreVerificato;
+
+            // Istruiamo la vista ad aggiornarsi
+            aggiornaVistaAzimut(valoreVerificato);
+        } else {
+            // Il cambiamento è troppo piccolo, non facciamo nulla
+            // (Ottimizzazione: evita ridisegni inutili)
+            console.log(`[DATI] Cambiamento trascurabile (${differenza}°). Nessun aggiornamento visivo.`);
+        }
+    }
+
+        // --- SIMULAZIONE FLUSSO DATI (TEST) ---
+
+        // Chiamata iniziale per impostare la vista
+        aggiornaVistaAzimut(datiSolarTracker.azimut);
+
+        console.log("--- Inizio Simulazione ---");
+
+        // Test 1: Riceviamo un dato con un cambiamento piccolissimo (0.1°)
+        setTimeout(() => riceviNuovoDatoAzimut(135.1), 1000); // Non dovrebbe aggiornare la vista
+
+        // Test 2: Riceviamo un dato con un cambiamento significativo (2°)
+        setTimeout(() => riceviNuovoDatoAzimut(137.1), 3000); // Dovrebbe aggiornare la vista
+
+        // Test 3: Riceviamo un dato con un cambiamento significativo (0.8°)
+        setTimeout(() => riceviNuovoDatoAzimut(137.9), 5000); // Dovrebbe aggiornare la vista
+
+        // Test 4: Riceviamo un dato che torna indietro leggermente (0.2°)
+        setTimeout(() => riceviNuovoDatoAzimut(137.7), 7000); // Non dovrebbe aggiornare la vista
+
+
+
+
+        //let valoreRandom = ()=> Math.floor(Math.random() * 255);
+        //const valoreSole = document.getElementById('valoreSole');
+        //valoreSole.innerHTML=` Il valore del sole è ${valoreRandom()}`;
 
 
         const arch = document.getElementById('arch');
             const ctx = arch.getContext('2d');
-            const arch_radius = 436;
+            const arch_radius = 300;
             
             let pos_arch_x = arch.width/2;
             let pos_arch_y = 500;
             let arch_dimension = Math.PI;
             let arch_section = (Math.PI)/3;
-            
+            const inner_radius = arch_radius - 50; // Raggio interno
 
         function drawArch(){
             for (let i = 0; i < 3; i++){
                 
                 const startAngle = i * arch_section + arch_dimension;
                 const endAngle = startAngle + arch_section; 
-                ctx.strokeStyle = `rgb(
+                ctx.fillStyle = `rgb(
                 0
                 ${Math.floor(255 - 42.5 * i)}
                 ${Math.floor(255 - 42.5 * i)})`;
                 
                 ctx.beginPath();
                 ctx.arc(pos_arch_x, pos_arch_y, arch_radius, startAngle, endAngle);
-                
+                ctx.arc(pos_arch_x, pos_arch_y, inner_radius, endAngle, startAngle, true);
+                ctx.closePath();
+                ctx.fill();
 
-                ctx.lineWidth = 30;
-                ctx.stroke();
+                
                 
                 }
                 
@@ -70,6 +157,7 @@
      
         console.log(arch.width/2);
          console.log(arch.height / 2);
+       //  window.location.reload();
     </script>
 
 </body>
