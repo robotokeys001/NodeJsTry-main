@@ -8,10 +8,21 @@
 
         @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
     
-        /* L'ago */
+        .chart{
+            display: flex;
+            flex-direction: column;
+            align-content: center;
+            justify-content: space-evenly;
+            gap: 40px;
+        } 
+        .arch{
+          max-width: 100%;
+          height: auto;
+        }
         /* L'ago */
         #needle {
             position: absolute;
+            padding-top: 40px;
             bottom: 0;
             left: 50%;
             width: 4px;
@@ -37,25 +48,14 @@
         }
 
         #label {
+            align-self: center;
             font-size: 2.5rem;
             font-weight: bold;
             margin-top: 10px;
             color: #333;
         }
       
-
-
-        .chart{
-            
-            justify-content: space-evenly;
-            gap: 20px;
-            
-        }
        
-        .arch{
-          max-width: 100%;
-          height: auto;
-        }
              
                 
     </style>
@@ -63,13 +63,12 @@
 <body>
      <div class="chart">
         <canvas id="arch" width="1000" height="500" class="arch"></canvas>
-        <!---------<canvas id="needle" width="100" height="150" class="needle"></canvas>---->
-    </div>
-     <div class="gauge">
         <div id="needle"></div>
         <div class="center-node"></div>
+        <div id="label">0</div>
     </div>
-    <div id="label">0</div>
+     
+    
 
     <script>
         let valoreRandom = ()=> Math.floor(Math.random() * 255);
@@ -210,7 +209,7 @@
             
             // Applichiamo i cambiamenti
             needle.style.transform = `rotate(${degrees}deg)`;
-            label.innerText = Math.floor(clampedValue);
+            label.innerText = `Il valore è ${Math.floor(clampedValue)}`;
         }
 
         /**
