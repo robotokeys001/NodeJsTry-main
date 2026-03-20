@@ -8,34 +8,71 @@
 
         @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
     
+        /* L'ago */
+        /* L'ago */
+        #needle {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 4px;
+            height: 130px;
+            background: #ff4757;
+            margin-left: -2px; /* Centratura */
+            transform-origin: bottom center;
+            transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 10;
+        }
+
+        /* Perno centrale */
+        .center-node {
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            background: #333;
+            border-radius: 50%;
+            transform: translateX(-50%);
+            z-index: 11;
+        }
+
+        #label {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-top: 10px;
+            color: #333;
+        }
+      
+
+
         .chart{
-            display: flex;
-            flex-direction: column;
+            
             justify-content: space-evenly;
             gap: 20px;
             
         }
-        .valoreSole{
-           font-family: "Inter", sans-serif;
-           align-self: center;
-           font-size: 40px; 
-           margin-top: -50px; 
-           
-        }
+       
         .arch{
           max-width: 100%;
           height: auto;
         }
-
+             
+                
     </style>
 </head>
 <body>
      <div class="chart">
         <canvas id="arch" width="1000" height="500" class="arch"></canvas>
-        <p id="valoreSole" class="valoreSole"></p>
+        <!---------<canvas id="needle" width="100" height="150" class="needle"></canvas>---->
     </div>
-    <script>
+     <div class="gauge">
+        <div id="needle"></div>
+        <div class="center-node"></div>
+    </div>
+    <div id="label">0</div>
 
+    <script>
+        let valoreRandom = ()=> Math.floor(Math.random() * 255);
                 // --- DATI (Simulati) ---
         // Valore iniziale del Solar Tracker (Azimut)
         let datiSolarTracker = {
@@ -57,7 +94,7 @@
             // ESEMPIO HTML: Aggiorna un testo in un elemento HTML
             const elementoAzimutText = document.getElementById('valoreSole');
             if (elementoAzimutText) {
-                elementoAzimutText.innerText = `${nuovoValore}°`;
+                elementoAzimutText.innerText = `Il valore attuale è ${nuovoValore}°`;
             }
 
             // ESEMPIO CANVAS: Chiamerebbe la tua funzione di disegno del Canvas
@@ -101,16 +138,17 @@
         console.log("--- Inizio Simulazione ---");
 
         // Test 1: Riceviamo un dato con un cambiamento piccolissimo (0.1°)
-        setTimeout(() => riceviNuovoDatoAzimut(135.1), 1000); // Non dovrebbe aggiornare la vista
-
+        
+        setTimeout(() => riceviNuovoDatoAzimut(valoreRandom()), 2000); // Non dovrebbe aggiornare la vista
+            
         // Test 2: Riceviamo un dato con un cambiamento significativo (2°)
-        setTimeout(() => riceviNuovoDatoAzimut(137.1), 3000); // Dovrebbe aggiornare la vista
+        //setTimeout(() => riceviNuovoDatoAzimut(137.1), 3000); // Dovrebbe aggiornare la vista
 
         // Test 3: Riceviamo un dato con un cambiamento significativo (0.8°)
-        setTimeout(() => riceviNuovoDatoAzimut(137.9), 5000); // Dovrebbe aggiornare la vista
+        //setTimeout(() => riceviNuovoDatoAzimut(137.9), 5000); // Dovrebbe aggiornare la vista
 
         // Test 4: Riceviamo un dato che torna indietro leggermente (0.2°)
-        setTimeout(() => riceviNuovoDatoAzimut(137.7), 7000); // Non dovrebbe aggiornare la vista
+        //setTimeout(() => riceviNuovoDatoAzimut(137.7), 7000); // Non dovrebbe aggiornare la vista
 
 
 
@@ -119,7 +157,7 @@
         //const valoreSole = document.getElementById('valoreSole');
         //valoreSole.innerHTML=` Il valore del sole è ${valoreRandom()}`;
 
-
+//----------------------Disegno arco--------------------------------------------------------------------------------------
         const arch = document.getElementById('arch');
             const ctx = arch.getContext('2d');
             const arch_radius = 300;
@@ -154,10 +192,54 @@
         
         drawArch();
       
-     
-        console.log(arch.width/2);
-         console.log(arch.height / 2);
-       //  window.location.reload();
+//------------------------------------Disegno ago------------------------------------------------------------------
+
+        let gaugeInterval = null;
+        const needle = document.getElementById('needle');
+        const label = document.getElementById('label');
+
+        function updateGauge(value) {
+            const min = 0;
+            const max = 100;
+            
+            // Limitiamo il valore tra 0 e 100
+            const clampedValue = Math.max(min, Math.min(max, value));
+            
+            // Calcolo rotazione: 0% = -90deg, 100% = 90deg
+            const degrees = (clampedValue / 100) * 180 - 90;
+            
+            // Applichiamo i cambiamenti
+            needle.style.transform = `rotate(${degrees}deg)`;
+            label.innerText = Math.floor(clampedValue);
+        }
+
+        /**
+         * Genera un valore random e aggiorna il grafico
+         */
+        function setRandomValue() {
+            const randomVal = Math.floor(Math.random() * 101);
+            updateGauge(randomVal);
+        }
+
+        /**
+         * Avvia l'intervallo automatico
+         */
+        function startAutoUpdate() {
+            if (gaugeInterval) return;
+
+            // Avvio ciclo: aggiorna ogni 2 secondi
+            gaugeInterval = setInterval(setRandomValue, 2000);
+            setRandomValue(); // Esecuzione immediata del primo valore
+        }
+
+        // --- INIZIALIZZAZIONE AUTOMATICA ---
+        window.onload = () => {
+            // Avviamo direttamente l'aggiornamento automatico
+            startAutoUpdate();
+            
+            // Log di debug come nel tuo esempio
+            console.log("Gauge avviato correttamente");
+        };
     </script>
 
 </body>
