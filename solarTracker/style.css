@@ -1,0 +1,155 @@
+ @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+        body{
+            background-color: bisque;
+            font-family: 'Inter', sans-serif;
+        }
+        .headline{
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+        }
+        
+        .sun {
+            position: relative;
+            width: 100px;
+            height: 100px;
+        
+        }
+
+        /* Il cerchio centrale */
+        .sun-body {
+            position: absolute;
+            
+            top:20px;
+            left: 30px;
+            width: 40px;
+            height: 40px;
+            background: #ff4757;
+            border-radius: 50%;
+            z-index: 2;
+            }
+
+        /* Definizione dei raggi come triangoli */
+        .ray {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+        
+            /* Creazione del triangolo con i bordi */
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 20px solid #ff4757;
+        
+            /* Punto di rotazione: spostiamo il raggio verso l'esterno 
+            e lo ruotiamo in base alla variabile --angle 
+            */
+            transform-origin: 50% 0%; 
+            transform: translate(-50%, -50%) rotate(var(--angle)) translateY(-35px);
+        }
+        
+        .chart{
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-content: center;
+            align-items: center;
+            background-color:rgba(244, 244, 244, 0.505) ;
+            border-radius: 30px;
+            width: fit-content;
+            height: auto;
+            max-width: 100%;
+
+            backdrop-filter: blur(15px); /* Sfoca ciò che sta dietro */
+            
+          
+        }
+        .arch-container {
+            position: relative;
+            width: 100%; /* Si adatta al padre */
+            
+            aspect-ratio: 2 / 1; /* Mantiene la forma di metà cerchio */
+            height: auto;
+        } 
+        .arch{
+         align-self: center;
+         width: 100%;
+         height: auto;
+        }
+        /* L'ago */
+        #needle {
+            align-self: center;
+
+            background: #ff4757;
+            
+            transform-origin: bottom center;
+            transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 10;
+            justify-content: center;
+            position: absolute;
+            bottom: 0;      /* Agganciato alla base del container */
+            left: 50%;      /* Centrato orizzontalmente */
+            width: 6px;
+            height: 200px;  /* Regola in base al raggio dell'arco */
+            
+            transform-origin: bottom center;
+            margin-left: -3px; /* Metà della larghezza per centrarlo perfettamente */
+            z-index: 10;
+            border-radius: 4px 4px 0 0;
+        }
+
+        /* Perno centrale */
+        .center-node {
+            align-self: center;
+            background: #333;
+            border-radius: 50%;
+            justify-content: center;
+            position: absolute;
+            bottom: -10px;  /* Leggermente abbassato per coprire la base dell'ago */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 30px;
+            background: #222;
+            border-radius: 50%;
+            z-index: 11;
+        }
+
+        #label {
+            font-family: Inter;
+            padding-bottom: 20px;
+            align-self: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-top: 10px;
+            color: #333;
+            justify-content: center;
+        }
+        
+
+        .riconoscimenti{
+            
+            display: flex;
+            flex-direction: row;
+        }
+        .fatto{
+            
+            font-family: Inter;
+        }
+        
+        .nomi{
+            font-weight: bold;
+            display: flex;
+            flex-direction: row;
+            gap: 15px;
+            font-family: Inter;
+            list-style:none;
+            align-items: center;
+            justify-content: center;
+            
+            
+        }
+     
+             

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+   <link rel="stylesheet" href="style.css">
+</head>
+<body>
+     
+
+    <div class="headline">
+        <h1 class="titolo">Solar Tracker</h1>
+        <div class="sun">
+    <div class="sun-body"></div>
+    <div class="ray" style="--angle: 0deg;"></div>
+    <div class="ray" style="--angle: 45deg;"></div>
+    <div class="ray" style="--angle: 90deg;"></div>
+    <div class="ray" style="--angle: 135deg;"></div>
+    <div class="ray" style="--angle: 180deg;"></div>
+    <div class="ray" style="--angle: 225deg;"></div>
+    <div class="ray" style="--angle: 270deg;"></div>
+    <div class="ray" style="--angle: 315deg;"></div>
+    </div>
+     </div>
+
+     <div class="chart">
+        <div class="arch-container">
+            <canvas id="arch" width="1000" height="500" class="arch"></canvas>
+            <div id="needle"></div>
+            <div class="center-node"></div>
+        </div>
+            
+            <div id="label">0</div>
+           
+    </div>
+        
+        
+     <div class="riconoscimenti">
+        <h3 class="fatto">Fatto da</h3>
+        <ul class="nomi">
+            <li>Chiara</li>
+            <li>Federico</li>
+            <li>Ahmed</li>
+            <li>Haroun</li>
+        </ul>
+     </div>
+
+     <script src="index.js"></script>
+     <script src="serverAndDatabase.js"></script>
+</body>
+</html>
