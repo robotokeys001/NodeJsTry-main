@@ -1,159 +1,120 @@
- window.addEventListener('DOMContentLoaded', () => {
-   // Qui fai partire il Solar Tracker
-   startAutoUpdate(); 
-   console.log("Tutti i sistemi (e i file JS) sono pronti!");
-});
- 
- let valoreRandom = () => Math.floor(Math.random() * 100);
-                // --- DATI (Simulati) ---
-        // Valore iniziale del Solar Tracker (Azimut)
-        let datiSolarTracker = {
-            azimut: 135 // Il valore attuale
-        };
+// --- CONFIGURAZIONE E STATO ---
+let datiSolarTracker = { azimut: 0 };
+const SOGLIA_CAMBIAMENTO_AZIMUT = 0.5;
+let ultimoValoreVisualizzatoAzimut = null;
 
-        // --- CONFIGURAZIONE SOGLIA ---
-        // Definiamo cosa costituisce un "cambiamento significativo" (es. > 0.5 gradi)
-        const SOGLIA_CAMBIAMENTO_AZIMUT = 0.5;
+// Riferimenti agli elementi (li inizializziamo dopo il caricamento del DOM)
+let elementoAzimutText, elementoStatusLog, needle, label, ctx;
 
-        // Memorizziamo l'ultimo valore che abbiamo visualizzato
-        let ultimoValoreVisualizzatoAzimut = datiSolarTracker.azimut;
-
-        // --- FUNZIONE DI AGGIORNAMENTO VISTA ---
-        // Questa funzione si occupa ESCLUSIVAMENTE di aggiornare l'elemento HTML/Canvas
-        function aggiornaVistaAzimut(nuovoValore) {
-            console.log(`[VISTA] Aggiornamento visivo dell'Azimut a: ${nuovoValore}°`);
-            
-            // ESEMPIO HTML: Aggiorna un testo in un elemento HTML
-            const elementoAzimutText = document.getElementById('valoreSole');
-            if (elementoAzimutText) {
-                elementoAzimutText.innerText = `Il valore attuale è ${nuovoValore}°`;
-            }
-
-            // ESEMPIO CANVAS: Chiamerebbe la tua funzione di disegno del Canvas
-            // (es. ridisegnare la lancetta o il gauge)
-            // drawArch(nuovoValore);
-        }
-
-// --- FUNZIONE DI AGGIORNAMENTO DATI E VERIFICA REATTIVA ---
-// Questa è la funzione centrale che riceve i nuovi dati grezzi
-    function riceviNuovoDatoAzimut(valoreGrezzo) {
-        // 1. Verifichiamo se il dato è un numero valido
-        let valoreVerificato = parseFloat(valoreGrezzo);
-        if (isNaN(valoreVerificato)) return;
-
-        // 2. Calcoliamo la differenza assoluta rispetto all'ultimo valore visualizzato
-        let differenza = Math.abs(valoreVerificato - ultimoValoreVisualizzatoAzimut);
-
-        // 3. Verifichiamo la significatività
-        if (differenza >= SOGLIA_CAMBIAMENTO_AZIMUT) {
-            // Il cambiamento è significativo! Aggiorniamo!
-            console.log(`[DATI] Rilevato cambiamento significativo (${differenza}°).`);
-            
-            // Aggiorniamo lo stato dei dati
-            datiSolarTracker.azimut = valoreVerificato;
-            ultimoValoreVisualizzatoAzimut = valoreVerificato;
-
-            // Istruiamo la vista ad aggiornarsi
-            aggiornaVistaAzimut(valoreVerificato);
-        } else {
-            // Il cambiamento è troppo piccolo, non facciamo nulla
-            // (Ottimizzazione: evita ridisegni inutili)
-            console.log(`[DATI] Cambiamento trascurabile (${differenza}°). Nessun aggiornamento visivo.`);
-        }
+// --- INIZIALIZZAZIONE ---
+window.addEventListener('DOMContentLoaded', () => {
+    // Recuperiamo gli elementi solo quando siamo sicuri che esistano
+    elementoAzimutText = document.getElementById('valoreSole');
+    elementoStatusLog = document.getElementById('statusLog');
+    needle = document.getElementById('needle');
+    label = document.getElementById('label');
+    const arch = document.getElementById('arch');
+    
+    if (arch) {
+        ctx = arch.getContext('2d');
+        drawArch();
     }
 
-        // --- SIMULAZIONE FLUSSO DATI (TEST) ---
+    console.log("Sistema pronto e DOM caricato.");
+    
+    // Facciamo partire il controllo del database
+    setInterval(recuperaDatiDalDatabase, 1000);
+});
 
-        // Chiamata iniziale per impostare la vista
-        aggiornaVistaAzimut(datiSolarTracker.azimut);
+// --- FUNZIONE DI AGGIORNAMENTO VISTA (Testo + Ago) ---
+function aggiornaVistaAzimut(nuovoValore) {
+    console.log(`[VISTA] Aggiornamento visivo: ${nuovoValore}°`);
+    
+    // 1. Aggiorna il testo
+    if (elementoAzimutText) {
+        elementoAzimutText.innerText = `Posizione attuale: ${nuovoValore}°`;
+    }
 
-        console.log("--- Inizio Simulazione ---");
+    // 2. Aggiorna l'ago del grafico (Gauge)
+    updateGauge(nuovoValore);
+}
 
-        // Test 1: Riceviamo un dato con un cambiamento piccolissimo (0.1°)
+// --- LOGICA REATTIVA ---
+function riceviNuovoDatoAzimut(valoreGrezzo) {
+    let valoreVerificato = parseFloat(valoreGrezzo);
+    if (isNaN(valoreVerificato)) return;
+
+    if (ultimoValoreVisualizzatoAzimut === null) {
+        ultimoValoreVisualizzatoAzimut = valoreVerificato;
+        aggiornaVistaAzimut(valoreVerificato);
+        return;
+    }
+
+    let differenza = Math.abs(valoreVerificato - ultimoValoreVisualizzatoAzimut);
+
+    if (differenza >= SOGLIA_CAMBIAMENTO_AZIMUT) {
+        console.log(`[DATI] Cambiamento significativo: ${differenza}°`);
+        ultimoValoreVisualizzatoAzimut = valoreVerificato;
+        aggiornaVistaAzimut(valoreVerificato);
         
-        setTimeout(() => riceviNuovoDatoAzimut(valoreRandom()), 2000); 
+        if (elementoStatusLog) elementoStatusLog.innerText = "Dato aggiornato dal database.";
+    }
+}
 
-//----------------------Disegno arco--------------------------------------------------------------------------------------
-        const arch = document.getElementById('arch');
-            const ctx = arch.getContext('2d');
-            const arch_radius = 300;
-            
-            let pos_arch_x = arch.width/2;
-            let pos_arch_y = 500;
-            let arch_dimension = Math.PI;
-            let arch_section = (Math.PI)/3;
-            const inner_radius = arch_radius - 50; // Raggio interno
-
-        function drawArch(){
-            for (let i = 0; i < 3; i++){
-                
-                const startAngle = i * arch_section + arch_dimension;
-                const endAngle = startAngle + arch_section; 
-                ctx.fillStyle = `rgb(
-                255
-                ${Math.floor(255-71 * i)}
-                ${Math.floor(255-87 * i)})`;
-                
-                ctx.beginPath();
-                ctx.arc(pos_arch_x, pos_arch_y, arch_radius, startAngle, endAngle);
-                ctx.arc(pos_arch_x, pos_arch_y, inner_radius, endAngle, startAngle, true);
-                ctx.closePath();
-                ctx.fill();
-
-                
-                
-                }
-                
-            }
+// --- FUNZIONE PER PESCARE I DATI DAL SERVER ---
+async function recuperaDatiDalDatabase() {
+    try {
+        const risposta = await fetch('/solartracker');
+        if (!risposta.ok) throw new Error("Server non raggiungibile");
         
-        drawArch();
-      
-//------------------------------------Disegno ago------------------------------------------------------------------
+        const dati = await risposta.json();
 
-        let gaugeInterval = null;
-        const needle = document.getElementById('needle');
-        const label = document.getElementById('label');
-        
-        function updateGauge(value) {
-            const min = 0;
-            const max = 100;
-            
-            // Limitiamo il valore tra 0 e 100
-            const clampedValue = Math.max(min, Math.min(max, value));
-            
-            // Calcolo rotazione: 0% = -90deg, 100% = 90deg
-            const degrees = (clampedValue / 100) * 180 - 90;
-            
-            // Applichiamo i cambiamenti
-            needle.style.transform = `rotate(${degrees}deg)`;
-            label.innerText = `Il valore è ${Math.floor(clampedValue)}`;
-            
+        if (dati.length > 0) {
+            const ultimoDato = dati[dati.length - 1];
+            riceviNuovoDatoAzimut(ultimoDato.valore);
         }
+    } catch (errore) {
+        console.error("Errore nel recupero dati:", errore);
+        if (elementoStatusLog) elementoStatusLog.innerText = "Errore connessione server.";
+    }
+}
 
-        /**
-         * Genera un valore random e aggiorna il grafico
-         */
-        function setRandomValue() {
-            const randomVal = Math.floor(Math.random() * 101);
-            updateGauge(randomVal);
-        }
+// --- DISEGNO ARCO (Canvas) ---
+function drawArch() {
+    if (!ctx) return;
+    const arch_radius = 300;
+    const pos_arch_x = 500; // Metà di 1000 (la larghezza del tuo canvas)
+    const pos_arch_y = 450; // Posizione verticale del centro dell'arco
+    const arch_section = Math.PI / 3;
+    const inner_radius = arch_radius - 50;
 
-        /**
-         * Avvia l'intervallo automatico
-         */
-        function startAutoUpdate() {
-            if (gaugeInterval) return;
+    ctx.clearRect(0, 0, 800, 600); // Pulisce prima di disegnare
 
-            // Avvio ciclo: aggiorna ogni 2 secondi
-            gaugeInterval = setInterval(setRandomValue, 2000);
-            setRandomValue(); // Esecuzione immediata del primo valore
-        }
+    for (let i = 0; i < 3; i++) {
+        const startAngle = i * arch_section + Math.PI;
+        const endAngle = startAngle + arch_section;
+        ctx.fillStyle = `rgb(255, ${Math.floor(255 - 71 * i)}, ${Math.floor(255 - 87 * i)})`;
 
-        // --- INIZIALIZZAZIONE AUTOMATICA ---
-        window.onload = () => {
-            // Avviamo direttamente l'aggiornamento automatico
-            startAutoUpdate();
-            
-            // Log di debug come nel tuo esempio
-            console.log("Gauge avviato correttamente");
-        };
+        ctx.beginPath();
+        ctx.arc(pos_arch_x, pos_arch_y, arch_radius, startAngle, endAngle);
+        ctx.arc(pos_arch_x, pos_arch_y, inner_radius, endAngle, startAngle, true);
+        ctx.closePath();
+        ctx.fill();
+    }
+}
+
+// --- AGGIORNAMENTO AGO (Gauge) ---
+function updateGauge(value) {
+    if (!needle) return;
+    
+    const min = 0;
+    const max = 180; // Cambiato a 180 perché il servo dell'ESP32 va da 0 a 180
+    
+    const clampedValue = Math.max(min, Math.min(max, value));
+    
+    // Mappa 0-180 gradi del servo su -90 a +90 gradi della rotazione CSS
+    const degrees = (clampedValue / max) * 180 - 90;
+    
+    needle.style.transform = `rotate(${degrees}deg)`;
+    if (label) label.innerText = `Angolo Servo: ${Math.floor(clampedValue)}°`;
+}
