@@ -49,85 +49,149 @@
             transform-origin: 50% 0%; 
             transform: translate(-50%, -50%) rotate(var(--angle)) translateY(-35px);
         }
-        
-        .chart{
-            position: relative;
+.content-center{
+
             display: flex;
+
+            gap: 30px;
+
+        }
+       .chart {
+    margin-left: 20px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: rgba(244, 244, 244, 0.505);
+    border-radius: 30px;
+    width: fit-content;
+    height: fit-content;
+    max-width: 100%;
+    backdrop-filter: blur(15px);
+    
+    /* Padding generoso per dare respiro al box */
+    padding: 30px 40px; 
+}
+
+.arch-container {
+    position: relative;
+    
+    /* Decidiamo noi la larghezza dell'arco! */
+    width: 100%;
+    
+    /* L'altezza sarà la metà esatta della larghezza (175px) */
+    aspect-ratio: 2 / 1; 
+} 
+
+.arch {
+    align-self: center;
+
+         width: 100%;
+
+         height: auto;
+}
+
+/* L'ago */
+#needle {
+    background: #ff4757;
+    transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 10;
+    position: absolute;
+    
+    /* POSIZIONAMENTO CALCOLATO: */
+    left: 50%;
+    bottom: 200px;          /* Si ancora perfettamente alla base dell'arco */
+    width: 6px;
+    height: 150px;      /* Lunghezza dell'ago che sta dentro l'arco */
+    
+    transform-origin: bottom center;
+    margin-left: -3px;  /* Perfettamente centrato sulla linea */
+    border-radius: 4px 4px 0 0;
+}
+
+/* Perno centrale */
+.center-node {
+    position: absolute;
+    left: 50%;
+    bottom: 180px;      /* Centrato a cavallo della linea di fondo */
+    transform: translateX(-50%);
+    width: 30px;
+    height: 30px;
+    background: #222;
+    border-radius: 50%;
+    z-index: 11;
+}
+
+.label {
+    font-family: Inter;
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    top:20px;
+}
+        .valoreLuce{
+            display: flex;
+            justify-content: center; /* Centra il sole orizzontalmente */
+            align-items: center;     /* Centra il sole verticalmente */
+            background-color: rgba(244, 244, 244, 0.505);
+            border-radius: 30px;
+            width: 600px;
+            height: 500px;
             flex-direction: column;
+            flex-wrap: wrap;
             align-content: center;
             align-items: center;
-            background-color:rgba(244, 244, 244, 0.505) ;
-            border-radius: 30px;
-            width: fit-content;
-            height: auto;
-            max-width: 100%;
-
-            backdrop-filter: blur(15px); /* Sfoca ciò che sta dietro */
-            
-          
-        }
-        .arch-container {
             position: relative;
-            width: 100%; /* Si adatta al padre */
-            
-            aspect-ratio: 2 / 1; /* Mantiene la forma di metà cerchio */
-            height: auto;
-        } 
-        .arch{
-         align-self: center;
-         width: 100%;
-         height: auto;
         }
-        /* L'ago */
-        #needle {
-            align-self: center;
-
-            background: #ff4757;
-            
-            transform-origin: bottom center;
-            transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 10;
+        .sun-center{
+            position: relative;
+            width: 250px;
+            height: 250px;
+            display: flex;
             justify-content: center;
+            align-items: center;
+            
+            
+        }
+        .sun-center-body {
             position: absolute;
-            bottom: 0;      /* Agganciato alla base del container */
-            left: 50%;      /* Centrato orizzontalmente */
-            width: 6px;
-            height: 200px;  /* Regola in base al raggio dell'arco */
-            
-            transform-origin: bottom center;
-            margin-left: -3px; /* Metà della larghezza per centrarlo perfettamente */
-            z-index: 10;
-            border-radius: 4px 4px 0 0;
-        }
-
-        /* Perno centrale */
-        .center-node {
-            align-self: center;
-            background: #333;
+            width: 250px;
+            height: 250px;
+            background: #ff4757; /* Puoi cambiarlo con #ffa502 per un giallo caldo */
             border-radius: 50%;
-            justify-content: center;
-            position: absolute;
-            bottom: -10px;  /* Leggermente abbassato per coprire la base dell'ago */
-            left: 50%;
-            transform: translateX(-50%);
-            width: 30px;
-            height: 30px;
-            background: #222;
-            border-radius: 50%;
-            z-index: 11;
-        }
+            z-index: 2;
+            }
 
-        #label {
-            font-family: Inter;
-            padding-bottom: 20px;
-            align-self: center;
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin-top: 10px;
-            color: #333;
-            justify-content: center;
-        }
+        .sun-center-ray {
         
+            position: absolute;
+            
+            
+            /* Creazione del triangolo con i bordi */
+            border-left: 55px solid transparent;
+            border-right: 55px solid transparent;
+            border-bottom: 120px solid #ff4757;
+            
+            /* Z-index 1 per stare SOTTO la sfera centrale */
+            z-index: 1; 
+            
+            /* TRUCCO MAGICO: 
+            Spostiamo il punto di rotazione al centro del sole (50% orizzontale, 165px verticale).
+            I 165px derivano da: metà altezza sole (125px) + distanza che vuoi dare al raggio (es. 40px).
+            */
+            transform-origin: 50% 100px; 
+            
+            /* Posizioniamo il raggio sopra il sole e lo ruotiamo.
+            La traslazione translateY(-165px) serve a spingerlo in alto rispetto al centro di rotazione.
+            */
+            transform: translate(0%, -33%) rotate(var(--angle)) translateY(-113px);
+        }
+
+        .valore-luce-p{
+            font-family: Inter;
+            position: relative;
+        }
 
         .riconoscimenti{
             

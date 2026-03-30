@@ -27,17 +27,24 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // --- FUNZIONE DI AGGIORNAMENTO VISTA (Testo + Ago) ---
-function aggiornaVistaAzimut(nuovoValore) {
-    console.log(`[VISTA] Aggiornamento visivo: ${nuovoValore}°`);
-    
-    // 1. Aggiorna il testo
-    if (elementoAzimutText) {
-        elementoAzimutText.innerText = `Posizione attuale: ${nuovoValore}°`;
-    }
 
-    // 2. Aggiorna l'ago del grafico (Gauge)
-    updateGauge(nuovoValore);
-}
+function aggiornaVistaAzimut(nuovoValore) {
+    if (!needle) return;
+    
+    const min = 0;
+    const max = 180; // Cambiato a 180 perché il servo dell'ESP32 va da 0 a 180
+    
+    const clampedValue = Math.max(min, Math.min(max, nuovoValore));
+    
+    // Mappa 0-180 gradi del servo su -90 a +90 gradi della rotazione CSS
+    const degrees = (clampedValue / max) * 180 - 90;
+    
+    needle.style.transform = `rotate(${degrees}deg)`;
+    if (label) label.innerText = `Angolo Servo: ${Math.floor(nuovoValore)}°`;
+    
+    
+    
+    }
 
 // --- LOGICA REATTIVA ---
 function riceviNuovoDatoAzimut(valoreGrezzo) {
@@ -71,7 +78,7 @@ async function recuperaDatiDalDatabase() {
 
         if (dati.length > 0) {
             const ultimoDato = dati[dati.length - 1];
-            riceviNuovoDatoAzimut(ultimoDato.valore);
+            riceviNuovoDatoAzimut(ultimoDato.servopos);
         }
     } catch (errore) {
         console.error("Errore nel recupero dati:", errore);
@@ -103,18 +110,3 @@ function drawArch() {
     }
 }
 
-// --- AGGIORNAMENTO AGO (Gauge) ---
-function updateGauge(value) {
-    if (!needle) return;
-    
-    const min = 0;
-    const max = 180; // Cambiato a 180 perché il servo dell'ESP32 va da 0 a 180
-    
-    const clampedValue = Math.max(min, Math.min(max, value));
-    
-    // Mappa 0-180 gradi del servo su -90 a +90 gradi della rotazione CSS
-    const degrees = (clampedValue / max) * 180 - 90;
-    
-    needle.style.transform = `rotate(${degrees}deg)`;
-    if (label) label.innerText = `Angolo Servo: ${Math.floor(clampedValue)}°`;
-}

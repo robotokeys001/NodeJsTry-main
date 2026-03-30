@@ -23,18 +23,36 @@
         </div>
     </div>
 
+ <div class="content-center">    
     <div class="chart">
         <div class="arch-container">
             <canvas id="arch" width="1000" height="600" class="arch"></canvas>
-            <div id="needle"></div>
+            <div id="needle" ></div>
             <div class="center-node"></div>
+            <div id="valoreSole"></div>
+            <div id="label"  class="label">Inizializzazione...</div>
         </div>
-        
-        <div id="valoreSole">In attesa di dati...</div>
-        <div id="label" style="margin-top: 10px; color: #666;">Inizializzazione...</div>
-        <div id="statusLog" style="font-size: 0.8em; color: gray; margin-top: 5px;"></div>
     </div>
-
+    
+    <div>
+        <div class="valoreLuce">
+            <div class="sun-center">
+                <div class="sun-center-body"></div>
+                <div class="sun-center-ray" style="--angle: 0deg;"></div>
+                <div class="sun-center-ray" style="--angle: 45deg;"></div>
+                <div class="sun-center-ray" style="--angle: 90deg;"></div>
+                <div class="sun-center-ray" style="--angle: 135deg;"></div>
+                <div class="sun-center-ray" style="--angle: 180deg;"></div>
+                <div class="sun-center-ray" style="--angle: 225deg;"></div>
+                <div class="sun-center-ray" style="--angle: 270deg;"></div>
+                <div class="sun-center-ray" style="--angle: 315deg;"></div>
+            </div>
+       
+        </div>
+     <p class="valore-luce-p">Il valore della luce è:</p>
+    </div>
+</div>
+    
     <div class="riconoscimenti">
         <h3 class="fatto">Fatto da</h3>
         <ul class="nomi">
