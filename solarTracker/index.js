@@ -4,7 +4,7 @@ const SOGLIA_CAMBIAMENTO_AZIMUT = 0.5;
 let ultimoValoreVisualizzatoAzimut = null;
 
 // Riferimenti agli elementi (li inizializziamo dopo il caricamento del DOM)
-let elementoAzimutText, elementoStatusLog, needle, label, ctx;
+let elementoAzimutText, elementoStatusLog, needle, label, ctx, valoreLuceS, valoreLuceD;
 
 // --- INIZIALIZZAZIONE ---
 window.addEventListener('DOMContentLoaded', () => {
@@ -13,6 +13,8 @@ window.addEventListener('DOMContentLoaded', () => {
     elementoStatusLog = document.getElementById('statusLog');
     needle = document.getElementById('needle');
     label = document.getElementById('label');
+    valoreLuceS = document.getElementById('dato-luce-s');
+    valoreLuceD = document.getElementById('dato-luce-d');
     const arch = document.getElementById('arch');
     
     if (arch) {
@@ -23,7 +25,7 @@ window.addEventListener('DOMContentLoaded', () => {
     console.log("Sistema pronto e DOM caricato.");
     
     // Facciamo partire il controllo del database
-    setInterval(recuperaDatiDalDatabase, 1000);
+    setInterval(leggiValoriDatabase, 1000);
 });
 
 // --- FUNZIONE DI AGGIORNAMENTO VISTA (Testo + Ago) ---
@@ -68,23 +70,26 @@ function riceviNuovoDatoAzimut(valoreGrezzo) {
     }
 }
 
-// --- FUNZIONE PER PESCARE I DATI DAL SERVER ---
-async function recuperaDatiDalDatabase() {
-    try {
-        const risposta = await fetch('/solartracker');
-        if (!risposta.ok) throw new Error("Server non raggiungibile");
-        
-        const dati = await risposta.json();
+    async function leggiValoriDatabase() {
+        try {
+            const res = await fetch('/solartracker');
+            if (!res.ok) throw new Error("Server non raggiungibile");
+            
+            const datoLuce = await res.json();
 
-        if (dati.length > 0) {
-            const ultimoDato = dati[dati.length - 1];
-            riceviNuovoDatoAzimut(ultimoDato.servopos);
+            if (datoLuce.length > 0) {
+                // Prendiamo l'ultimo elemento una volta sola
+                const lastData = datoLuce.at(-1); // Usiamo .at(-1) che è più pulito di [length - 1]
+                
+                // Aggiorniamo entrambi i nodi del DOM insieme
+                valoreLuceS.innerText = `Valore fotoresistenza sinistra ${lastData.light_s}`;
+                valoreLuceD.innerText = `Valore fotoresistenza destra ${lastData.light_d}`;
+                riceviNuovoDatoAzimut(lastData.servopos);
+            }
+        } catch (errore) {
+            console.error("Errore nel recupero dati:", errore);
         }
-    } catch (errore) {
-        console.error("Errore nel recupero dati:", errore);
-        if (elementoStatusLog) elementoStatusLog.innerText = "Errore connessione server.";
     }
-}
 
 // --- DISEGNO ARCO (Canvas) ---
 function drawArch() {

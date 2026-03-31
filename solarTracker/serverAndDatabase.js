@@ -26,7 +26,7 @@ const query = database.prepare('SELECT * FROM solartracker ORDER BY sensori_id')
 // --- SERVER CONFIG ---
 //configuro l'host per ascoltare qualsiasi indirizzo IP
 const hostname = '0.0.0.0';
-//alla porta 3000 per lo sviluppo per server locali
+//alla porta 3000 per lo sviluppo dei server locali
 const port = 3000;
 
 //creo il server con i parametri req(request) e res(response)
