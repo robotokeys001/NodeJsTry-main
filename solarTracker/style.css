@@ -3,6 +3,10 @@
         * {
             box-sizing: border-box;
         }
+
+        .titolo{
+            font-size: 48px;
+        }
         body{
             background-color: bisque;
             font-family: 'Inter', sans-serif;
@@ -12,12 +16,16 @@
             flex-direction: row;
             justify-content: center;
             color: #333;
+            align-items: center;
+            
         }
         
         .sun {
             position: relative;
             width: 100px;
             height: 100px;
+            align-self: center;
+            
             
         
         }
@@ -167,11 +175,12 @@
 
         .sun-center {
             position: relative;
-            
+            margin-top: 40px;
+            margin-bottom: 40px;
             display: flex;
             justify-content: center;
             align-items: center;
-
+            
             width: clamp(120px, 30vw, 180px); 
             height: clamp(120px, 30vw, 180px);
             --sun-size: clamp(120px, 35cqi, 200px);
@@ -199,9 +208,10 @@
             position: absolute;
             width: 100%;
             height: 100%;
-            background: #ff4757; /* Puoi cambiarlo con #ffa502 per un giallo caldo */
+            background: #ff4757; 
             border-radius: 50%;
             z-index: 2;
+            
             }
 
         
@@ -229,11 +239,13 @@
             flex-direction: row;
         }
         .fatto{
+            font-size: 26px;
             margin-left: 20px;
             font-family: Inter;
         }
         
         .nomi{
+            font-size: 22px;
             font-weight: bold;
             display: flex;
             flex-direction: row;
